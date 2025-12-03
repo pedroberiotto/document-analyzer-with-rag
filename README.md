@@ -21,7 +21,7 @@
       <sub><b>Indexing pipeline</b></sub>
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/9a096942-d9f3-4ef4-afd4-701ef88563d0" width="95%"/><br/>
+      <img src="https://github.com/user-attachments/assets/53e34298-9815-4378-9ed8-d55ea87d8833" width="95%"/><br/>
       <sub><b>RAG loop per field</b></sub>
     </td>
   </tr>

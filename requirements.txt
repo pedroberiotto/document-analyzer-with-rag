@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+
+streamlit
+
+langchain
+langchain-community
+langchain-text-splitters
+langchain-openai
+
+pypdf
+python-multipart
+pydantic>=2
+
+chromadb

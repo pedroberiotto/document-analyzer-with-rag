@@ -14,15 +14,18 @@
 
 ## 🧠 RAG Architecture
 
-### 🧱 Indexing pipeline
-
-![RAG](https://github.com/user-attachments/assets/70e479a4-4577-4b98-a9ba-546d6d9b1fe8)
-
-
-### 🔁 RAG loop per field
-
-![RAG2-2](https://github.com/user-attachments/assets/9a096942-d9f3-4ef4-afd4-701ef88563d0)
-
+<table>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/70e479a4-4577-4b98-a9ba-546d6d9b1fe8" width="95%"/><br/>
+      <sub><b>Indexing pipeline</b></sub>
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/9a096942-d9f3-4ef4-afd4-701ef88563d0" width="95%"/><br/>
+      <sub><b>RAG loop per field</b></sub>
+    </td>
+  </tr>
+</table>
 
 ---
 

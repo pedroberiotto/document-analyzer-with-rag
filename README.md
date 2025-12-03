@@ -14,27 +14,15 @@
 
 ## 🧠 RAG Architecture
 
-High-level flow from PDF upload to structured output:
+### 🧱 Indexing pipeline
 
-```mermaid
-flowchart LR
-    A[Upload PDF\n(Streamlit / API)] --> B[PDF Loader\n(PyPDFLoader)]
-    B --> C[Text Splitter\n(RecursiveCharacterTextSplitter)]
-    C --> D[Embeddings\n(OpenAI text-embedding-3-small)]
-    D --> E[Vector Store\n(Chroma per document_id)]
+![RAG](https://github.com/user-attachments/assets/70e479a4-4577-4b98-a9ba-546d6d9b1fe8)
 
-    subgraph RAG Loop per Field
-        F[Extraction Schema\n(JSON: fields + descriptions)]
-        F --> G[Build Field Query]
-        G --> H[Retriever\n(E.from Chroma)]
-        H --> I[LLM + Prompt\n(ChatOpenAI gpt-4.1-mini)]
-        I --> J[FieldAnswer\n(value, confidence, justification)]
-    end
 
-    E --> H
-    J --> K[Aggregation\nExtractionResult]
-    K --> L[UI Response\n(values + confidence + evidence)]
-```
+### 🔁 RAG loop per field
+
+![RAG2-2](https://github.com/user-attachments/assets/9a096942-d9f3-4ef4-afd4-701ef88563d0)
+
 
 ---
 

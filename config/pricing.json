@@ -1,0 +1,20 @@
+{
+  "_note": "USD prices per 1 million tokens. Verify and update at https://openai.com/api/pricing",
+  "_updated": "2025-01",
+  "models": {
+    "gpt-4.1":            { "input_per_1m": 2.00,  "output_per_1m": 8.00  },
+    "gpt-4.1-mini":       { "input_per_1m": 0.40,  "output_per_1m": 1.60  },
+    "gpt-4.1-nano":       { "input_per_1m": 0.10,  "output_per_1m": 0.40  },
+    "gpt-4o":             { "input_per_1m": 2.50,  "output_per_1m": 10.00 },
+    "gpt-4o-mini":        { "input_per_1m": 0.15,  "output_per_1m": 0.60  },
+    "gpt-4-turbo":        { "input_per_1m": 10.00, "output_per_1m": 30.00 },
+    "gpt-3.5-turbo":      { "input_per_1m": 0.50,  "output_per_1m": 1.50  },
+    "text-embedding-3-small": { "input_per_1m": 0.02, "output_per_1m": 0.00 },
+    "text-embedding-3-large": { "input_per_1m": 0.13, "output_per_1m": 0.00 },
+    "text-embedding-ada-002": { "input_per_1m": 0.10, "output_per_1m": 0.00 },
+
+    "llama3.2:3b":       { "input_per_1m": 0.00, "output_per_1m": 0.00 },
+    "qwen2.5:7b":        { "input_per_1m": 0.00, "output_per_1m": 0.00 },
+    "nomic-embed-text":  { "input_per_1m": 0.00, "output_per_1m": 0.00 }
+  }
+}

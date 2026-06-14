@@ -1,5 +1,6 @@
-from .extraction_schema import ExtractionSchema, ExtractionField
 from .extraction_result import ExtractionResult, FieldResult, SourceSpan
+from .extraction_schema import ExtractionField, ExtractionSchema
+from .telemetry import ExtractionResponse, FieldUsage, RunTelemetry
 
 __all__ = [
     "ExtractionSchema",
@@ -7,4 +8,7 @@ __all__ = [
     "ExtractionResult",
     "FieldResult",
     "SourceSpan",
+    "RunTelemetry",
+    "FieldUsage",
+    "ExtractionResponse",
 ]

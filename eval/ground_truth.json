@@ -1,0 +1,124 @@
+{
+  "_note": "Benchmark sobre documentos de mercado de capitais brasileiro (securitização / debêntures). Os PDFs NÃO são versionados (eval/dataset/*.pdf está no .gitignore).",
+  "schemas": [
+    {
+      "name": "emissao_mobiliaria",
+      "description": "Campos-chave de um documento de emissão de valores mobiliários (Termo de Securitização ou Escritura de Emissão).",
+      "fields": [
+        {
+          "name": "tipo_instrumento",
+          "description": "Tipo do título mobiliário EMITIDO pela companhia emissora/securitizadora NESTE documento (a oferta principal). Responda exatamente um entre: 'Debêntures', 'Certificados de Recebíveis Imobiliários' ou 'Certificados de Recebíveis do Agronegócio'. ATENÇÃO: não confunda com os ativos que servem de LASTRO/garantia da emissão. Em um Termo de Securitização de Certificados de Recebíveis do Agronegócio (CRA), o título emitido é o CRA — mesmo que o documento cite muitas vezes 'debêntures' como o direito creditório subjacente. Use o título do documento e a expressão 'para emissão de ...' como referência.",
+          "type": "string",
+          "required": true,
+          "retrieval_query": "Que tipo de título mobiliário é o objeto principal desta emissão: debêntures, certificados de recebíveis imobiliários (CRI) ou certificados de recebíveis do agronegócio (CRA)? Título e objeto do termo de securitização ou escritura de emissão."
+        },
+        {
+          "name": "emissora",
+          "description": "Razão social completa da companhia EMISSORA do título ofertado (a parte qualificada como 'Emissora' na abertura do documento; nos CRI/CRA é a securitizadora, nas debêntures é a própria companhia emissora). Não use o nome do agente fiduciário, da devedora, da cedente, do coordenador líder nem do custodiante.",
+          "type": "string",
+          "required": true,
+          "retrieval_query": "Qual a razão social da companhia Emissora, conforme a qualificação inicial das partes (sociedade com sede, inscrita no CNPJ, neste ato representada)?"
+        },
+        {
+          "name": "cnpj_emissora",
+          "description": "CNPJ da companhia EMISSORA (a parte definida como 'Emissora'), no formato XX.XXX.XXX/XXXX-XX. Pegue o CNPJ que aparece na qualificação da Emissora ('inscrita no CNPJ/ME sob o nº ...'). Não use o CNPJ do agente fiduciário, da devedora ou de outras partes.",
+          "type": "string",
+          "required": true,
+          "retrieval_query": "Qual o número do CNPJ da Emissora, indicado em sua qualificação (companhia com sede, inscrita no CNPJ/ME sob o nº)?"
+        },
+        {
+          "name": "cidade_sede_emissora",
+          "description": "Apenas o nome da CIDADE onde fica a sede da Emissora, conforme a cláusula de qualificação ('com sede na Cidade de ...' ou 'no município de ...'). Não inclua estado, rua nem número.",
+          "type": "string",
+          "required": true,
+          "retrieval_query": "Em qual cidade está localizada a sede da Emissora (com sede na Cidade de, Estado de)?"
+        },
+        {
+          "name": "numero_emissao",
+          "description": "Número ordinal da emissão à qual este documento se refere, como um inteiro (ex.: '4ª (quarta) emissão' => 4; '46ª emissão' => 46). Retorne somente o número, sem o símbolo ordinal.",
+          "type": "number",
+          "required": true,
+          "retrieval_query": "A que número de emissão se refere este Termo de Securitização ou Escritura de Emissão (a quarta, a segunda, a quadragésima sexta emissão)?"
+        },
+        {
+          "name": "numero_series",
+          "description": "Quantidade total de séries DESTA emissão, como um inteiro. Conte as séries citadas no título (ex.: '155ª e 156ª séries' => 2; '1ª e 2ª séries' => 2; 'série única' => 1). Retorne somente o número.",
+          "type": "number",
+          "required": true,
+          "retrieval_query": "Quantas séries compõem esta emissão? Séries da emissão (155ª e 156ª séries, 1ª e 2ª séries, série única)."
+        },
+        {
+          "name": "agente_fiduciario",
+          "description": "Razão social completa da instituição que atua como AGENTE FIDUCIÁRIO, representando os titulares/debenturistas (parte às vezes definida como 'Agente Fiduciário' ou 'Debenturista'). Use o nome por extenso como na qualificação (ex.: 'Pentágono S.A. Distribuidora de Títulos e Valores Mobiliários'). Não confunda com a Emissora, o coordenador, o banco liquidante, o escriturador ou o custodiante, nem com outra empresa do mesmo grupo econômico.",
+          "type": "string",
+          "required": true,
+          "retrieval_query": "Qual a razão social da instituição contratada como Agente Fiduciário, representando a comunhão dos titulares/debenturistas?"
+        },
+        {
+          "name": "cnpj_agente_fiduciario",
+          "description": "CNPJ da instituição definida como AGENTE FIDUCIÁRIO (ou 'Debenturista'), no formato XX.XXX.XXX/XXXX-XX, conforme a qualificação dessa parte. Não use o CNPJ da Emissora, da devedora, nem de outra empresa do mesmo grupo do agente fiduciário.",
+          "type": "string",
+          "required": true,
+          "retrieval_query": "Qual o número do CNPJ do Agente Fiduciário, conforme sua qualificação (instituição financeira inscrita no CNPJ/ME sob o nº)?"
+        },
+        {
+          "name": "data_emissao",
+          "description": "Data de Emissão do título (o termo definido como 'Data de Emissão' no documento, ou a data que consta no cabeçalho/'Datado de'), por extenso EXATAMENTE como aparece (ex.: '14 de julho de 2020'). Não use datas de assinatura digital, de portarias/normativos citados, de reuniões societárias, de vencimento ou de outros eventos.",
+          "type": "date",
+          "required": true,
+          "retrieval_query": "Qual a Data de Emissão definida para os títulos desta emissão (datado de; a data de emissão das debêntures/certificados será)?"
+        }
+      ]
+    }
+  ],
+  "documents": [
+    {
+      "document_id": "CRI-ISEC",
+      "pdf_filename": "20L0766583.pdf",
+      "schema": "emissao_mobiliaria",
+      "fields": {
+        "tipo_instrumento": "Certificados de Recebíveis Imobiliários",
+        "emissora": "ISEC Securitizadora S.A.",
+        "cnpj_emissora": "08.769.451/0001-08",
+        "cidade_sede_emissora": "São Paulo",
+        "numero_emissao": "4",
+        "numero_series": "2",
+        "agente_fiduciario": "Simplific Pavarini Distribuidora de Títulos e Valores Mobiliários Ltda.",
+        "cnpj_agente_fiduciario": "15.227.994/0004-01",
+        "data_emissao": "18 de dezembro de 2020"
+      }
+    },
+    {
+      "document_id": "DEB-Alcoeste",
+      "pdf_filename": "ABFR12.pdf",
+      "schema": "emissao_mobiliaria",
+      "fields": {
+        "tipo_instrumento": "Debêntures",
+        "emissora": "Alcoeste Bioenergia Fernandópolis S.A.",
+        "cnpj_emissora": "43.545.284/0001-04",
+        "cidade_sede_emissora": "Fernandópolis",
+        "numero_emissao": "2",
+        "numero_series": "1",
+        "agente_fiduciario": "Vórtx Distribuidora de Títulos e Valores Mobiliários Ltda.",
+        "cnpj_agente_fiduciario": "22.610.500/0001-88",
+        "data_emissao": "15 de dezembro de 2021"
+      }
+    },
+    {
+      "document_id": "CRA-VERT",
+      "pdf_filename": "CRA020002GZ.pdf",
+      "schema": "emissao_mobiliaria",
+      "fields": {
+        "tipo_instrumento": "Certificados de Recebíveis do Agronegócio",
+        "emissora": "VERT Companhia Securitizadora",
+        "cnpj_emissora": "25.005.683/0001-09",
+        "cidade_sede_emissora": "São Paulo",
+        "numero_emissao": "46",
+        "numero_series": "2",
+        "agente_fiduciario": "Pentágono S.A. Distribuidora de Títulos e Valores Mobiliários",
+        "cnpj_agente_fiduciario": "17.343.682/0001-38",
+        "data_emissao": "14 de julho de 2020"
+      }
+    }
+  ]
+}

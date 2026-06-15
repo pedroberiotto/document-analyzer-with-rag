@@ -1,95 +1,97 @@
-from pathlib import Path
-from typing import Dict
+from contextlib import asynccontextmanager
 from uuid import uuid4
 
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, File, HTTPException, UploadFile
 
-from app.models.extraction_schema import ExtractionSchema
-from app.models.extraction_result import ExtractionResult
-from app.services.ingestion_langchain import (
-    build_retriever_from_pdf,
-    load_retriever_for_document,
+from app.config import get_settings
+from app.errors import DocumentNotFoundError, ExtractionError, InvalidDocumentError
+from app.models import ExtractionResponse, ExtractionSchema
+from app.retrieval import RerankerType, RetrieverStrategy
+from app.service import get_service
+from app.telemetry import configure_logging
+
+SCHEMAS: dict[str, ExtractionSchema] = {}
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    configure_logging()
+    get_settings().ensure_dirs()
+    yield
+
+
+app = FastAPI(
+    title="Document Analyser With RAG",
+    description="Extract structured fields from PDFs using RAG (LangChain + Chroma + OpenAI).",
+    version="0.2.0",
+    lifespan=lifespan,
 )
-from app.services.rag_langchain import extract_with_langchain
 
 
-app = FastAPI(title="Document Analyser With RAG (LangChain + Chroma + OpenAI)")
-
-BASE_PATH = Path(__file__).resolve().parent.parent
-UPLOAD_DIR = BASE_PATH / "data" / "uploads"
-UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-
-RETRIEVERS: Dict[str, object] = {}
-SCHEMAS: Dict[str, ExtractionSchema] = {}
+@app.get("/healthz")
+async def healthz():
+    return {"status": "ok"}
 
 
 @app.post("/documents/upload")
 async def upload_document(file: UploadFile = File(...)):
-    """
-    Upload a PDF, index it in Chroma and return a document_id.
-    """
-    if not file.filename.lower().endswith(".pdf"):
-        raise HTTPException(
-            status_code=400,
-            detail="Only PDF files are supported for now.",
-        )
+    if not file.filename or not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Only PDF files are supported.")
 
     doc_id = str(uuid4())
-    file_path = UPLOAD_DIR / f"{doc_id}.pdf"
+    file_path = get_settings().uploads_dir / f"{doc_id}.pdf"
+    file_path.write_bytes(await file.read())
 
-    content = await file.read()
-    with file_path.open("wb") as f:
-        f.write(content)
-
-    retriever = build_retriever_from_pdf(str(file_path), document_id=doc_id)
-    RETRIEVERS[doc_id] = retriever
+    try:
+        get_service().index_document(str(file_path), document_id=doc_id)
+    except InvalidDocumentError as exc:
+        file_path.unlink(missing_ok=True)
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     return {"document_id": doc_id, "filename": file.filename}
 
 
-@app.post("/schemas", response_model=dict)
+@app.get("/documents")
+async def list_documents() -> list[str]:
+    from app.ingestion import list_documents as _list
+
+    return _list()
+
+
+@app.post("/schemas")
 async def create_schema(schema: ExtractionSchema):
-    """
-    Register an extraction schema (fields + descriptions).
-    """
     SCHEMAS[schema.name] = schema
     return {"schema_name": schema.name}
 
 
-def _get_retriever(document_id: str):
-    """
-    Get a retriever for a given document_id, either from memory cache
-    or by reloading from Chroma.
-    """
-    if document_id in RETRIEVERS:
-        return RETRIEVERS[document_id]
-    retriever = load_retriever_for_document(document_id)
-    RETRIEVERS[document_id] = retriever
-    return retriever
+@app.get("/schemas")
+async def list_schemas() -> list[str]:
+    return sorted(SCHEMAS.keys())
 
 
-@app.post("/extract", response_model=ExtractionResult)
-async def extract(document_id: str, schema_name: str):
-    """
-    Run the extraction (RAG) for a given document_id + schema_name.
-    """
-    retriever = _get_retriever(document_id)
-    if retriever is None:
-        raise HTTPException(
-            status_code=404,
-            detail="document_id not found.",
-        )
-
+@app.post("/extract", response_model=ExtractionResponse)
+async def extract(
+    document_id: str,
+    schema_name: str,
+    retriever_strategy: RetrieverStrategy = RetrieverStrategy.DENSE,
+    reranker: RerankerType = RerankerType.NONE,
+    k: int | None = None,
+):
     schema = SCHEMAS.get(schema_name)
     if schema is None:
-        raise HTTPException(
-            status_code=404,
-            detail="schema not found.",
-        )
+        raise HTTPException(status_code=404, detail="schema not found.")
 
-    result = extract_with_langchain(
-        document_id=document_id,
-        schema=schema,
-        retriever=retriever,
-    )
-    return result
+    try:
+        outcome = get_service().extract(
+            document_id=document_id,
+            schema=schema,
+            strategy=retriever_strategy,
+            reranker=reranker,
+            k=k,
+        )
+    except DocumentNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="document_id not found.") from exc
+    except ExtractionError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+    return ExtractionResponse(result=outcome.result, telemetry=outcome.telemetry)

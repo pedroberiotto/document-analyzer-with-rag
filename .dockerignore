@@ -1,0 +1,20 @@
+.venv/
+.git/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# Runtime data & secrets
+data/
+*.db
+.env
+.streamlit/secrets.toml
+
+# Eval inputs/outputs
+eval/dataset/*.pdf
+eval/results/*.db
+eval/results/*.json
+eval/results/*.csv
+
+.DS_Store

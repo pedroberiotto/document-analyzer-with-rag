@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "document-analyzer-rag"
+version = "0.2.0"
+description = "Modular RAG pipeline for structured field extraction from PDFs (LangChain + Chroma, pluggable LLM providers)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+
+dependencies = [
+    # API + UI
+    "fastapi==0.122.0",
+    "uvicorn[standard]==0.38.0",
+    "streamlit==1.51.0",
+    "python-multipart==0.0.20",
+    # LangChain core + integrations
+    "langchain==1.1.0",
+    "langchain-community==0.4.1",
+    "langchain-core==1.4.7",
+    "langchain-text-splitters==1.0.0",
+    "langchain-openai==1.1.0",
+    "langchain-ollama==1.1.0",
+    "langchain-chroma==1.1.0",
+    "chromadb==1.3.5",
+    # Ingestion
+    "pypdf==6.4.0",
+    "pdfplumber==0.11.9",
+    # Retrieval
+    "rank-bm25==0.2.2",
+    # Models / config / observability
+    "pydantic==2.12.4",
+    "pydantic-settings==2.12.0",
+    "tiktoken==0.12.0",
+    "structlog==26.1.0",
+]
+
+[project.optional-dependencies]
+# Cross-encoder reranking is heavy (pulls torch); install only when needed.
+reranker = ["sentence-transformers>=3,<6"]
+dev = [
+    "pytest==9.0.3",
+    "ruff==0.15.17",
+]
+
+[tool.setuptools.packages.find]
+include = ["app*", "eval*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501", "B008"]  # E501: handled by formatter; B008: FastAPI Depends/File pattern
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]  # re-exports
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"

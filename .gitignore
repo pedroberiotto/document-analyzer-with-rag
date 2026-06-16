@@ -1,13 +1,37 @@
+# Virtualenv
 .venv/
+venv/
 
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*.egg
+*.egg-info/
+build/
+dist/
 
+# Tooling caches
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Secrets / local config
 .env
 .streamlit/
 .streamlit/secrets.toml
 
+# Runtime data
 data/uploads/
 data/chroma/
+data/*.db
 
+# Eval artifacts (keep the dirs via .gitkeep)
+eval/dataset/*.pdf
+eval/results/*.db
+eval/results/*.json
+eval/results/*.csv
+
+# OS
 .DS_Store

@@ -1,0 +1,37 @@
+services:
+  api:
+    build: .
+    image: document-analyzer-rag:latest
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    env_file: [.env]
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+
+  ui:
+    image: document-analyzer-rag:latest
+    depends_on: [api]
+    command: streamlit run streamlit_app.py --server.port 8501 --server.address 0.0.0.0
+    ports:
+      - "8501:8501"
+    env_file: [.env]
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+
+  # Optional fully-local LLM. Enable with: docker compose --profile local up
+  # Then set in .env: LLM_PROVIDER=ollama, EMBEDDING_PROVIDER=ollama,
+  #                   OLLAMA_BASE_URL=http://ollama:11434
+  ollama:
+    image: ollama/ollama:latest
+    profiles: ["local"]
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    restart: unless-stopped
+
+volumes:
+  ollama:

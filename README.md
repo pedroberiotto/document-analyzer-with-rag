@@ -1,6 +1,6 @@
 # 📄 Document Analyser RAG
 
-> A modular AI pipeline for extracting structured data from PDFs using RAG with OpenAI, LangChain, and Chroma — with pluggable retrieval strategies, an evaluation harness, and full cost/latency observability.
+> A modular AI pipeline for extracting structured data from PDFs using RAG with OpenAI, LangChain, and Chroma, with pluggable retrieval strategies, an evaluation harness, and full cost/latency observability.
 
 [![CI](https://github.com/pedroberiotto/document-analyzer-with-rag/actions/workflows/ci.yml/badge.svg)](https://github.com/pedroberiotto/document-analyzer-with-rag/actions/workflows/ci.yml)
 ![App](https://img.shields.io/badge/App-Streamlit-ff4b4b)
@@ -15,20 +15,20 @@
 
 ## ✨ Features
 
-- 🔌 **Bring-your-own schema** — define custom fields in JSON (name + description + type).
-- 📚 **RAG over a single document** — chunk, embed, and index each PDF in its own Chroma collection.
-- 📑 **Table-aware ingestion** — tables are extracted (pdfplumber) and indexed as whole chunks, so table-heavy financial/legal docs stay searchable.
-- 🛡️ **Robustness** — typed errors (invalid PDF → 422, unknown doc → 404, LLM failure → 502), request timeouts, exponential-backoff retries, and embedding cache by `document_id` (no double-billing).
-- 🔀 **Pluggable retrieval strategies**
-  - `dense` — vector similarity
-  - `hybrid` — BM25 + dense fused with Reciprocal Rank Fusion (RRF)
-  - `agentic` — iterative retrieval that re-queries when context confidence is low
-  - optional **cross-encoder reranking** on top of any strategy
-- 🧠 **LLM field extraction** — structured outputs (Pydantic) with `confidence` + evidence `sources[]`.
-- 🔌 **Pluggable providers** — OpenAI or **Ollama** (local/free) via one env var.
-- 📊 **Observability** — structured logs (structlog) plus per-field / per-document **tokens, USD cost, and latency** persisted to SQLite.
-- 🧪 **Evaluation harness** — run a strategy over an annotated dataset and compare all strategies (field accuracy, retrieval precision, faithfulness, latency, cost).
-- 🖥️ **Streamlit UI** + ⚙️ **FastAPI** sharing one orchestration service.
+- **Custom extraction schemas:** define the fields to extract in JSON (name, description, type).
+- **Per-document indexing:** each PDF is chunked, embedded, and stored in its own Chroma collection.
+- **Table-aware ingestion:** tables are extracted with pdfplumber and indexed as whole chunks, so table-heavy financial and legal documents stay searchable.
+- **Resilient request handling:** typed errors (invalid PDF returns 422, unknown document returns 404, LLM failure returns 502), request timeouts, exponential backoff retries, and an embedding cache keyed by `document_id` to avoid re-billing.
+- **Pluggable retrieval strategies:**
+  - `dense`: vector similarity
+  - `hybrid`: BM25 and dense fused with Reciprocal Rank Fusion (RRF)
+  - `agentic`: iterative retrieval that re-queries when context confidence is low
+  - optional cross-encoder reranking on top of any strategy
+- **Structured field extraction:** Pydantic-validated outputs, each field carrying a confidence score and supporting source snippets.
+- **Multiple model providers:** OpenAI or local Ollama, selected through a single environment variable.
+- **Observability:** structured logs (structlog) plus per-field and per-document tokens, USD cost, and latency persisted to SQLite.
+- **Evaluation harness:** run one strategy over an annotated dataset, or compare strategies on field accuracy, retrieval precision, faithfulness, latency, and cost.
+- **Two interfaces:** a Streamlit UI and a FastAPI service sharing one orchestration layer.
 
 ---
 
